@@ -36,18 +36,26 @@ export default function App() {
       } catch (error) {
         console.error("Error initializing app:", error);
       } finally {
+        // Always finish loading, even if there's an error
         setLoading(false);
       }
     };
 
-    initializeApp();
+    // Set a timeout to ensure loading doesn't get stuck
+    const timeout = setTimeout(() => {
+      setLoading(false);
+    }, 3000);
+
+    initializeApp().finally(() => clearTimeout(timeout));
+
+    return () => clearTimeout(timeout);
   }, []);
 
   if (loading) {
     return (
       <GestureHandlerRootView style={{ flex: 1 }}>
         <SafeAreaProvider>
-          <View className="flex-1 items-center justify-center bg-green-50">
+          <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#f0fdf4" }}>
             <ActivityIndicator size="large" color="#10b981" />
           </View>
         </SafeAreaProvider>
