@@ -36,3 +36,10 @@ yarn-error.*
 # iOS & Android
 ios/
 android/
+
+# Build artifacts
+*.zip
+*.tar.gz
+*.apk
+*.aab
+*.ipa
