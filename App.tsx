@@ -1,42 +1,74 @@
+import React, { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
-import { Text, View } from "react-native";
+import { View, ActivityIndicator } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-
-/*
-IMPORTANT NOTICE: DO NOT REMOVE
-There are already environment keys in the project. 
-Before telling the user to add them, check if you already have access to the required keys through bash.
-Directly access them with process.env.${key}
-
-Correct usage:
-process.env.EXPO_PUBLIC_VIBECODE_{key}
-//directly access the key
-
-Incorrect usage:
-import { OPENAI_API_KEY } from '@env';
-//don't use @env, its depreicated
-
-Incorrect usage:
-import Constants from 'expo-constants';
-const openai_api_key = Constants.expoConfig.extra.apikey;
-//don't use expo-constants, its depreicated
-
-*/
+import { FirebaseService } from "./src/api/firebase";
+import { useGameStore } from "./src/state/gameStore";
+import { AuthScreen } from "./src/screens/AuthScreen";
+import { MainApp } from "./src/screens/MainApp";
 
 export default function App() {
-  return (
-    <GestureHandlerRootView>
-      <SafeAreaProvider>
-        <NavigationContainer>
-          <View className="flex-1 items-center justify-center">
-            <Text className="text-center text-red-500">
-              This screen will be replaced with your app when the agent is done building it.
-            </Text>
-            <StatusBar style="auto" />
+  const [loading, setLoading] = useState(true);
+  
+  const isAuthenticated = useGameStore((s) => s.isAuthenticated);
+  const setCurrentUser = useGameStore((s) => s.setCurrentUser);
+  const setAuthenticated = useGameStore((s) => s.setAuthenticated);
+
+  useEffect(() => {
+    // Initialize Firebase and check for existing auth
+    const initializeApp = async () => {
+      try {
+        await FirebaseService.initialize();
+        
+        // Check if user is authenticated
+        if (FirebaseService.isAuthenticated()) {
+          const userId = FirebaseService.getCurrentUserId();
+          if (userId) {
+            const player = await FirebaseService.getDatabaseValue<any>(`/players/${userId}`);
+            if (player) {
+              setCurrentUser(player);
+              setAuthenticated(true);
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error initializing app:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initializeApp();
+  }, []);
+
+  if (loading) {
+    return (
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <SafeAreaProvider>
+          <View className="flex-1 items-center justify-center bg-green-50">
+            <ActivityIndicator size="large" color="#10b981" />
           </View>
-        </NavigationContainer>
+        </SafeAreaProvider>
+      </GestureHandlerRootView>
+    );
+  }
+
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        {isAuthenticated ? (
+          <NavigationContainer>
+            <MainApp />
+            <StatusBar style="dark" />
+          </NavigationContainer>
+        ) : (
+          <>
+            <AuthScreen />
+            <StatusBar style="dark" />
+          </>
+        )}
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
