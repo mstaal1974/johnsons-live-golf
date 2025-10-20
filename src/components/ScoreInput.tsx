@@ -3,7 +3,7 @@ import { View, Text, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 interface ScoreInputProps {
-  value: number;
+  value?: number;
   onIncrement: () => void;
   onDecrement: () => void;
   disabled?: boolean;
@@ -31,9 +31,9 @@ export const ScoreInput: React.FC<ScoreInputProps> = ({
     <View className="flex-row items-center justify-center space-x-4">
       <Pressable
         onPress={onDecrement}
-        disabled={disabled || value === 0}
+        disabled={disabled || value == null || value === 0}
         className={`w-12 h-12 rounded-full items-center justify-center ${
-          disabled || value === 0 ? "bg-gray-200" : "bg-red-500"
+          disabled || value == null || value === 0 ? "bg-gray-200" : "bg-red-500"
         }`}
       >
         <Ionicons
@@ -45,7 +45,7 @@ export const ScoreInput: React.FC<ScoreInputProps> = ({
 
       <View className="w-20 h-20 rounded-2xl bg-gray-100 items-center justify-center border-2 border-gray-300">
         <Text className={`text-4xl font-bold ${scoreColor}`}>
-          {value || "-"}
+          {value != null ? value : "-"}
         </Text>
       </View>
 

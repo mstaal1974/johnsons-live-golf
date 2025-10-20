@@ -180,8 +180,8 @@ export const ScorecardTab: React.FC = () => {
     }
   };
 
-  const completedHoles = holeScores.length;
-  const totalHoles = course.holes.length;
+  const completedHoles = holeScores.filter((s) => typeof s.strokes === "number" && s.strokes > 0).length;
+  const totalHoles = course.holes.length || 1;
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50" edges={["top"]}>
@@ -195,7 +195,7 @@ export const ScorecardTab: React.FC = () => {
           <View className="flex-1 h-2 bg-gray-200 rounded-full mr-2">
             <View
               className="h-2 bg-green-600 rounded-full"
-              style={{ width: `${(completedHoles / totalHoles) * 100}%` }}
+              style={{ width: `${Math.max(0, Math.min(1, completedHoles / totalHoles)) * 100}%` }}
             />
           </View>
           <Text className="text-xs font-medium text-gray-600">

@@ -47,15 +47,15 @@ export function calculateTeamHandicap(playerHandicaps: number[]): number {
   
   // Standard Ambrose formula based on team size
   if (teamSize === 2) {
-    return (sorted[0] * 0.35 + sorted[1] * 0.15);
+    return Math.round(sorted[0] * 0.35 + sorted[1] * 0.15);
   } else if (teamSize === 3) {
-    return (sorted[0] * 0.3 + sorted[1] * 0.15 + sorted[2] * 0.1);
+    return Math.round(sorted[0] * 0.3 + sorted[1] * 0.15 + sorted[2] * 0.1);
   } else if (teamSize === 4) {
-    return (sorted[0] * 0.25 + sorted[1] * 0.15 + sorted[2] * 0.1 + sorted[3] * 0.05);
+    return Math.round(sorted[0] * 0.25 + sorted[1] * 0.15 + sorted[2] * 0.1 + sorted[3] * 0.05);
   }
   
   // For larger teams, use a simplified formula
-  return sorted[0] * 0.25 + (sorted.slice(1).reduce((sum, h) => sum + h, 0) / (teamSize - 1)) * 0.15;
+  return Math.round(sorted[0] * 0.25 + (sorted.slice(1).reduce((sum, h) => sum + h, 0) / (teamSize - 1)) * 0.15);
 }
 
 /**
